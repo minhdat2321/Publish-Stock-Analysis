@@ -8,7 +8,6 @@ from columns_settings import color_mapping
 import os
 
 api_key = st.secrets["FMP_API_KEY"]
-# api_key= "xxUbfrh3hsbcydCGtbYZxqpH1jaufUzB"
 
 def fundamental_chart(  ticker = 'AAPL'):
 
