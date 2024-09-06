@@ -12,7 +12,7 @@ api_key = st.secrets["FMP_API_KEY"]
 
 def fundamental_chart(  ticker = 'AAPL'):
 
-  df_final, company_dt, revenue_product, Revenue_region = fmp_function.load_data(apikey=api_key, Ticker=ticker, period='quarter', limit=10)
+  df_final, company_dt = fmp_function.load_data(apikey=api_key, Ticker=ticker, period='quarter', limit=10)
 
   header_chart(df_final,company_dt=company_dt, tick=ticker)
 
