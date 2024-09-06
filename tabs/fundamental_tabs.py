@@ -6,7 +6,6 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 import fmpsdk
-import config
 
 def test_call():
   load_dotenv()
