@@ -12,10 +12,8 @@ def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
     cashflow = pd.DataFrame(fmpsdk.cash_flow_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit))
     income = pd.DataFrame(fmpsdk.income_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit))
     ratio = pd.DataFrame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit))
-    financial_growth = pd.DataFrame(fmpsdk.financial_growth(apikey=apikey, symbol=Ticker,period=period, limit=limit))
 
     company_profile = pd.DataFrame(fmpsdk.company_profile(apikey=apikey, symbol=Ticker))
-
 
     ttm_ratio = pd.DataFrame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker))
 
@@ -30,15 +28,24 @@ def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
     segment_regions = json_flatton_data(segment_regions)
 
 
-    df_concat = pd.concat([bsheet,cashflow,income,ratio,financial_growth,ttm_ratio],axis=1)
+    df_concat = pd.concat([bsheet,cashflow,income,ratio,ttm_ratio],axis=1)
     df_final = df_concat.loc[:, ~df_concat.columns.duplicated()]
+
+
+
+
    # df_final['date'] = pd.to_datetime(df_final['date'])r
     df_final['fiscal_date'] = df_final['period'].astype(str) + "-" +  df_final['calendarYear'].astype(str)
     df_final = df_final.set_index('fiscal_date')
     df_final = df_final[::-1]
+    period_shift = 4 if period == 'quarter' else 1
+    numeric_cols = df_final.select_dtypes(include='number')
+    pct_change_df = numeric_cols.pct_change(fill_method=None,periods=period_shift).map(lambda x: round(x, 4))
 
+    pct_change_df = pct_change_df.add_suffix('_pct_change')
+    merge_dt = pd.merge(df_final, pct_change_df, how='left', left_index=True, right_index=True)
 
-    return df_final,company_profile, segment_product,segment_regions
+    return merge_dt,company_profile, segment_product,segment_regions
 
 
 @st.cache_data

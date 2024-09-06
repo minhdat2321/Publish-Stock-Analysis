@@ -11,7 +11,7 @@ def create_stacked_bar_chart(data, title = None,bar_col = None, color_mapping = 
                 return f'#{random.randint(0, 0xFFFFFF):06x}'
             fig = go.Figure()
             if bar_col is not None:
-
+              bar_col = bar_col[::-1]
               for col in bar_col:
                   fig.add_trace(go.Bar(
                       x=data.index,
