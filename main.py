@@ -7,4 +7,4 @@ import fmpsdk
 from tabs import fundamental_tabs
 
 
-fundamental_tabs.test_call()
+fundamental_tabs.fundamental_chart()

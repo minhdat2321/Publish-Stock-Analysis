@@ -1,16 +1,14 @@
-import pandas 
 import streamlit as st
 import numpy as np
 import pandas as pd
-
-from dotenv import load_dotenv
-import os
 import fmpsdk
+from function import fmp_function
 
-def test_call():
-  load_dotenv()
-  api_key = st.secrets["FMP_API_KEY"]
-  
 
-  dt = fmpsdk.balance_sheet_statement(apikey=api_key, symbol='AAPL')
-  st.write(dt)
+#api_key = st.secrets["FMP_API_KEY"]
+api_key= "xxUbfrh3hsbcydCGtbYZxqpH1jaufUzB"
+
+def fundamental_chart():
+
+  df_final, company_dt, revenue_product, Revenue_region = fmp_function.load_data(apikey=api_key, Ticker='AAPL', period='quarter', limit=10)
+  st.write(df_final)
