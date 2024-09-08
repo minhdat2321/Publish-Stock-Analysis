@@ -34,7 +34,8 @@ def create_stacked_bar_chart(data, title = None,bar_col = None, color_mapping = 
                         line=dict( width=2),
                         marker=dict( size=8),
                         hoverinfo='y+name',
-                        yaxis=line_axis
+                        yaxis=line_axis,
+                        marker_color=color_mapping.get(line, get_random_color()) if color_mapping else get_random_color(),
                     ))
 
             # Update layout

@@ -9,14 +9,14 @@ from function.common_function import json_flatton_data, transform_to_percentage
 def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
 
     bsheet = pd.DataFrame(fmpsdk.balance_sheet_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit))
+
     cashflow = pd.DataFrame(fmpsdk.cash_flow_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit))
+
     income = pd.DataFrame(fmpsdk.income_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit))
+    
     ratio = pd.DataFrame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit))
 
-    company_profile = pd.DataFrame(fmpsdk.company_profile(apikey=apikey, symbol=Ticker))
-
-    ttm_ratio = pd.DataFrame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker))
-
+    # ttm_ratio = pd.DataFrame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker))
 
     # segment_product = fmpsdk.revenue_product_by_segments(apikey, symbol=Ticker,period=period, limit=limit, structure='flat')
     # segment_product = json_flatton_data(segment_product)
@@ -28,10 +28,8 @@ def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
     # segment_regions = json_flatton_data(segment_regions)
 
 
-    df_concat = pd.concat([bsheet,cashflow,income,ratio,ttm_ratio],axis=1)
+    df_concat = pd.concat([bsheet,cashflow,income,ratio],axis=1)
     df_final = df_concat.loc[:, ~df_concat.columns.duplicated()]
-
-
 
 
    # df_final['date'] = pd.to_datetime(df_final['date'])r
@@ -45,7 +43,18 @@ def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
     pct_change_df = pct_change_df.add_suffix('_pct_change')
     merge_dt = pd.merge(df_final, pct_change_df, how='left', left_index=True, right_index=True)
 
-    return merge_dt,company_profile
+    return merge_dt
+
+
+@st.cache_data
+def header_data(apikey, Ticker='AAPL', period='quarter', limit=10):
+    company_profile = pd.DataFrame(fmpsdk.company_profile(apikey=apikey, symbol=Ticker))
+
+    ratio = pd.DataFrame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit))
+    ttm_ratio = pd.DataFrame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker))
+
+    df_concat = pd.concat([ ratio, ttm_ratio], axis=1)
+    return df_concat, company_profile
 
 
 @st.cache_data
