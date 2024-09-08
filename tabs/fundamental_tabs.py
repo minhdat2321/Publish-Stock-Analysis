@@ -6,7 +6,10 @@ from function import fmp_function, plot_chart_function
 from tabs.header_dashboard import header_chart
 from columns_settings import columns_settings
 import os
-import config
+try:
+  import config
+except ImportError:
+  pass
 from data_handling import data_manipulation
 
 api_key = st.secrets["FMP_API_KEY"]
