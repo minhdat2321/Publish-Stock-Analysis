@@ -95,6 +95,8 @@ def calc_data(data,type_dt,roe_type,adjust_bs, period_option):
 
 
       data['researchAndDevelopmentExpenses'] = data['Amortization R&D Expenses']
+  else:
+      data['Unamortization R&D'] = 0
 
   if type_dt == "TTM" and period_option == "quarter":
 
