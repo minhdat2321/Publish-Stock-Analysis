@@ -150,6 +150,10 @@ def calc_data(data,type_dt,roe_type,adjust_bs, period_option):
   # Valuation
 
   data['epsdiluted'] = data['netIncome'] / data['weightedAverageShsOutDil']
+  data['daysOfPayablesOutstanding'] = -data['daysOfPayablesOutstanding']
+
+
+
 
 
   return data

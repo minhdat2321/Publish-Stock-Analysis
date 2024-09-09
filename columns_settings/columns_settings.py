@@ -166,7 +166,8 @@ profit_margin_dupoint_break_setting_val = {
         'ebtPerEbit': 'Interest Burden',
         'ebitPerRevenue': 'EBIT margin'
         },
-    'line_val': {}
+    'line_val': {
+    }
 }
 
 
@@ -177,9 +178,12 @@ operating_cycle_setting_val = {
         'daysOfInventoryOutstanding':'yellow',
         'daysOfPayablesOutstanding':'pink',
         'daysOfSalesOutstanding':'green',
+
         },
 
-    'line_val':{}
+    'line_val':{
+        'cashConversionCycle': 'red'
+    }
 }
 
 ROIC_ROE_pumed_setting_val = {

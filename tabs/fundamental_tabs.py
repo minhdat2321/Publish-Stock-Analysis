@@ -102,7 +102,8 @@ def fundamental_chart(  ticker = 'AAPL'):
     c3: [
           ["Cash Flow",columns_settings.cashflow_setting_val,],
           ["Cost Break down",columns_settings.cost_break_down_setting_val, 'y1'],
-          ["Income", columns_settings.income_setting_val,'y2']
+          ["Income", columns_settings.income_setting_val,'y2'],
+          ['Operating cycle', columns_settings.operating_cycle_setting_val, 'y2']
 
          ],
   }
