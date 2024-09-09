@@ -8,11 +8,11 @@ from columns_settings import columns_settings
 import os
 try:
   import config
+  api_key = config.API_KEY_FMP
 except ImportError:
-  pass
+    api_key = st.secrets["FMP_API_KEY"]
 from data_handling import data_manipulation
 
-api_key = st.secrets["FMP_API_KEY"]
 
 
 
@@ -47,8 +47,13 @@ def fundamental_chart(  ticker = 'AAPL'):
 
 
   # Chart data
-  df_final  = fmp_function.load_data(apikey=api_key, Ticker=ticker, period=period_option, limit=number_period)
+  df_final,segment_product, segment_regions  = fmp_function.load_data(apikey=api_key, Ticker=ticker, period=period_option, limit=number_period)
+
   df_final = data_manipulation.calc_data(df_final, type_dt=type_dt, roe_type=roe_type, adjust_bs=adjust_bs, period_option=period_option)
+
+  segment_product = segment_product[['Mac', 'Service', 'iPad', 'iPhone','Wearables, Home and Accessories']]
+  segment_product = segment_product.dropna()
+
 
   c1,c2,c3 = st.columns([1,1,1])
   chart_dict = {
@@ -59,7 +64,14 @@ def fundamental_chart(  ticker = 'AAPL'):
            ],
           ["Revenue",columns_settings.revenue_setting_val,'y2'],
           ['Profit Margin', columns_settings.profit_mrg_color_mapping],
-          ['Dupoint Model', columns_settings.dupoint_setting_val,'y2']
+          ['Dupoint Model', columns_settings.dupoint_setting_val,'y2'],
+          ['Revenue by Region',
+            columns_settings.segment_region_setting_val,
+            'y1',
+            False,
+            segment_regions,
+
+            ]
           
           ],
 
@@ -69,7 +81,20 @@ def fundamental_chart(  ticker = 'AAPL'):
           ["Liabilities",columns_settings.liabilities_setting_val],
           ["Income break down",columns_settings.income_breakdown_color_mapping],
           ["Capital Expenditure",columns_settings.capex_depr_setting_val],
-         
+          ['ROIC',
+            columns_settings.ROIC_ROE_pumed_setting_val,
+            'y1',
+            True # Area chart
+              ],
+          ['Revenue by Product',
+            columns_settings.segment_product_setting_val,
+            'y1',
+            False,
+            segment_product,
+
+            ]
+
+        
          ],
          
 
@@ -97,15 +122,18 @@ def fundamental_chart(  ticker = 'AAPL'):
               col_mapping = merge_color_mapping(cols_chart[i][1])
               title_chart = cols_chart[i][0]
               y_axis = cols_chart[i][2] if len(cols_chart[i]) > 2 else None
+              area_chart = cols_chart[i][3] if len(cols_chart[i]) > 3 else False
+              data = cols_chart[i][4] if len(cols_chart[i]) > 4 else df_final
 
               st.plotly_chart(
                   plot_chart_function.create_stacked_bar_chart(
-                      df_final,
+                      data,
                       title=title_chart,
                       bar_col=list(cols_chart[i][1]['cols_val'].keys()),  # Create col list
                       line_col=list(cols_chart[i][1]['line_val']),  # Create line list
                       color_mapping=col_mapping,
-                        line_axis=y_axis  # Merged color mapping
+                      line_axis=y_axis,  # Merged color mapping
+                      area_chart=area_chart
                   )
               )
 

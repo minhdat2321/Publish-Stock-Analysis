@@ -1,9 +1,8 @@
 import pandas as pd
 import streamlit as st
 from plotly import graph_objects as go
-import fmpsdk
 from function.common_function import json_flatton_data, transform_to_percentage
-
+from ModifiedModule import fmpsdk
 
 @st.cache_data
 def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
@@ -18,14 +17,14 @@ def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
 
     # ttm_ratio = pd.DataFrame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker))
 
-    # segment_product = fmpsdk.revenue_product_by_segments(apikey, symbol=Ticker,period=period, limit=limit, structure='flat')
-    # segment_product = json_flatton_data(segment_product)
-    # try:
-    #     segment_product = segment_product.drop('Product', axis=1)
-    # except KeyError:
-    #     segment_product = segment_product
-    # segment_regions = fmpsdk.revenue_geographic_segmentation(apikey, symbol=Ticker,period=period, limit=limit, structure='flat')
-    # segment_regions = json_flatton_data(segment_regions)
+    segment_product = fmpsdk.revenue_product_by_segments(apikey, symbol=Ticker,period=period, limit=limit, structure='flat')
+    segment_product = json_flatton_data(segment_product)
+    try:
+        segment_product = segment_product.drop('Product', axis=1)
+    except KeyError:
+        segment_product = segment_product
+    segment_regions = fmpsdk.revenue_geographic_segmentation(apikey, symbol=Ticker,period=period, limit=limit, structure='flat')
+    segment_regions = json_flatton_data(segment_regions)
 
 
     df_concat = pd.concat([bsheet,cashflow,income,ratio],axis=1)
@@ -43,7 +42,7 @@ def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
     pct_change_df = pct_change_df.add_suffix('_pct_change')
     merge_dt = pd.merge(df_final, pct_change_df, how='left', left_index=True, right_index=True)
 
-    return merge_dt
+    return merge_dt, segment_product, segment_regions
 
 
 @st.cache_data

@@ -34,17 +34,21 @@ cashflow_setting_val = {
 
 revenue_setting_val = {
         'cols_val':
-            {'revenue': '#2adaf3',},
+            {'revenue': 'rgb(101,191,211)',
+             
+             },
 
         'line_val':{
-          'revenue_pct_change': 'blue'
+          'revenue_pct_change': 'rgb(192,192,192)',
+
+
         }
 
 }
 
 income_setting_val = {
       'cols_val':
-            {'netIncome': '#2adaf3',},
+            {'netIncome': 'rgb(23,198,132)',},
 
         'line_val':{
           'netIncome_pct_change': 'yellow'
@@ -176,4 +180,40 @@ operating_cycle_setting_val = {
         },
 
     'line_val':{}
+}
+
+ROIC_ROE_pumed_setting_val = {
+  'cols_val':{
+
+  },
+
+
+  'line_val': {
+    'ROIC': 'red',
+    'ROE pumped': 'blue'
+  }
+}
+
+segment_product_setting_val = {
+  'cols_val':{
+    'iPhone': 'green',
+    'iPad': 'blue',
+    'Mac': 'red',
+    'Service': 'green',
+    'Wearables, Home and Accessories': 'orange'
+
+  },
+  'line_val':{}
+}
+
+segment_region_setting_val = {
+  'cols_val':
+  {
+    'Americas Segment': 'red',
+    'Europe Segment': 'green',
+    'Greater China Segment': 'orange',
+    'Japan Segment': 'yellow',
+    'Rest of Asia Pacific Segment': 'blue',
+  },
+  'line_val':{}
 }

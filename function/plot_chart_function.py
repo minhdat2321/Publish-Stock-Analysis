@@ -3,9 +3,9 @@ from plotly import graph_objects as go
 import random
 import pandas as pd
 
-def create_stacked_bar_chart(data, title = None,bar_col = None, color_mapping = None, line_col=None, barmode='relative',legend=False, line_axis ='y2'):
+def create_stacked_bar_chart(data, title = None,bar_col = None, color_mapping = None, line_col=None, barmode='relative',legend=False, line_axis ='y2', area_chart = False):
 
-            currency = data['reportedCurrency'].iloc[0]
+            currency = 'USD'
 
             def get_random_color():
                 return f'#{random.randint(0, 0xFFFFFF):06x}'
@@ -31,8 +31,9 @@ def create_stacked_bar_chart(data, title = None,bar_col = None, color_mapping = 
                         y=data[line],
                         mode='lines+markers',
                         name=line,
+                        fill='tozeroy' if area_chart is True else None,
                         line=dict( width=2),
-                        marker=dict( size=8),
+                        marker=dict( size=4),
                         hoverinfo='y+name',
                         yaxis=line_axis,
                         marker_color=color_mapping.get(line, get_random_color()) if color_mapping else get_random_color(),

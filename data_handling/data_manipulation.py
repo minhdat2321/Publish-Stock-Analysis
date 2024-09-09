@@ -36,7 +36,7 @@ def calc_data(data,type_dt,roe_type,adjust_bs, period_option):
   amortization_summary = amortization_df.groupby("Quarter").sum().reset_index()
 
   # Create a list of all possible quarters in the range
-  all_quarters = pd.date_range(start='2019-07-01', periods=len(rd_capitalize)+amortization_period, freq='Q').to_period('Q')
+  all_quarters = pd.date_range(start='2017-07-01', periods=len(rd_capitalize)+amortization_period, freq='Q').to_period('Q')
 
   # Map the quarters to the amortization summary
   amortization_summary["Quarter Name"] = amortization_summary["Quarter"].apply(lambda x: all_quarters[x].strftime('Q%q-%Y'))
