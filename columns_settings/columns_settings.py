@@ -200,11 +200,11 @@ ROIC_ROE_pumed_setting_val = {
 
 segment_product_setting_val = {
   'cols_val':{
-    'iPhone': 'green',
-    'iPad': 'blue',
-    'Mac': 'red',
-    'Service': 'green',
-    'Wearables, Home and Accessories': 'orange'
+    # 'iPhone': 'green',
+    # 'iPad': 'blue',
+    # 'Mac': 'red',
+    # 'Service': 'green',
+    # 'Wearables, Home and Accessories': 'orange'
 
   },
   'line_val':{}
@@ -213,11 +213,11 @@ segment_product_setting_val = {
 segment_region_setting_val = {
   'cols_val':
   {
-    'Americas Segment': 'red',
-    'Europe Segment': 'green',
-    'Greater China Segment': 'orange',
-    'Japan Segment': 'yellow',
-    'Rest of Asia Pacific Segment': 'blue',
+    # 'Americas Segment': 'red',
+    # 'Europe Segment': 'green',
+    # 'Greater China Segment': 'orange',
+    # 'Japan Segment': 'yellow',
+    # 'Rest of Asia Pacific Segment': 'blue',
   },
   'line_val':{}
 }
