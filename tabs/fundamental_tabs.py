@@ -51,8 +51,8 @@ def fundamental_chart(  ticker = 'AAPL'):
 
   df_final = data_manipulation.calc_data(df_final, type_dt=type_dt, roe_type=roe_type, adjust_bs=adjust_bs, period_option=period_option)
 
-  segment_product = segment_product[['Mac', 'Service', 'iPad', 'iPhone','Wearables, Home and Accessories']]
-  segment_product = segment_product.dropna()
+#   segment_product = segment_product[['Mac', 'Service', 'iPad', 'iPhone','Wearables, Home and Accessories']]
+#   segment_product = segment_product.dropna()
 
 
   c1,c2,c3 = st.columns([1,1,1])
