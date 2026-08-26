@@ -1,2 +1,19 @@
+# Local configuration / secrets
 config.py
+.env
+.streamlit/secrets.toml
 
+# Virtual environments
+.venv/
+venv/
+myenv/
+
+# Python cache / build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE / OS files
+.vscode/
+.DS_Store
+Thumbs.db
