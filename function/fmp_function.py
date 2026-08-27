@@ -56,6 +56,14 @@ def response_frame(response, endpoint):
     """Return a DataFrame from any supported FMP response shape."""
     return pd.DataFrame.from_records(response_records(response, endpoint))
 
+
+def _add_legacy_aliases(frame, aliases):
+    """Expose old column names used by the dashboard from Stable API fields."""
+    for old_name, stable_name in aliases.items():
+        if old_name not in frame and stable_name in frame:
+            frame[old_name] = frame[stable_name]
+    return frame
+
 @st.cache_data
 def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
 
@@ -81,6 +89,11 @@ def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
 
     df_concat = pd.concat([bsheet,cashflow,income,ratio],axis=1)
     df_final = df_concat.loc[:, ~df_concat.columns.duplicated()]
+    df_final = _add_legacy_aliases(df_final, {
+        "calendarYear": "fiscalYear",
+        "priceEarningsRatio": "priceToEarningsRatio",
+        "priceEarningsToGrowthRatio": "priceToEarningsGrowthRatio",
+    })
 
 
    # df_final['date'] = pd.to_datetime(df_final['date'])r
@@ -100,6 +113,20 @@ def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
 @st.cache_data
 def header_data(apikey, Ticker='AAPL', period='quarter', limit=10):
     company_profile = response_frame(fmpsdk.company_profile(apikey=apikey, symbol=Ticker), "company profile")
+    company_profile = _add_legacy_aliases(company_profile, {
+        "changes": "change",
+        "exchangeShortName": "exchange",
+        "mktCap": "marketCap",
+        "volAvg": "averageVolume",
+    })
+
+    ratio = response_frame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit), "financial ratios")
+    ratio = _add_legacy_aliases(ratio, {
+        "priceEarningsRatio": "priceToEarningsRatio",
+        "priceEarningsToGrowthRatio": "priceToEarningsGrowthRatio",
+    })
+    ttm_ratio = response_frame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker), "TTM financial ratios")
+    ttm_ratio = _add_legacy_aliases(ttm_ratio, {"peRatioTTM": "priceToEarningsRatioTTM"})
 
     ratio = response_frame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit), "financial ratios")
     ttm_ratio = response_frame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker), "TTM financial ratios")

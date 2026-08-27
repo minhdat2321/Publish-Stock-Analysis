@@ -1,5 +1,11 @@
 import pytest
 
+from function.fmp_function import (
+    FMPDataError,
+    _add_legacy_aliases,
+    response_frame,
+    response_records,
+)
 from function.fmp_function import FMPDataError, response_frame, response_records
 
 
@@ -20,6 +26,20 @@ def test_response_frame_accepts_a_single_record():
     frame = response_frame({"symbol": "AAPL", "price": 100}, "profile")
 
     assert frame.to_dict("records") == [{"symbol": "AAPL", "price": 100}]
+
+
+def test_stable_fields_are_available_under_dashboard_column_names():
+    frame = response_frame(
+        {"marketCap": 100, "averageVolume": 20, "fiscalYear": 2025},
+        "profile",
+    )
+
+    result = _add_legacy_aliases(
+        frame,
+        {"mktCap": "marketCap", "volAvg": "averageVolume", "calendarYear": "fiscalYear"},
+    )
+
+    assert result.loc[0, ["mktCap", "volAvg", "calendarYear"]].tolist() == [100, 20, 2025]
 
 
 @pytest.mark.parametrize(
