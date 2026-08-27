@@ -1,19 +1,71 @@
 import pandas as pd
 import streamlit as st
-from plotly import graph_objects as go
-from function.common_function import json_flatton_data, transform_to_percentage
+from function.common_function import json_flatton_data
 from ModifiedModule import fmpsdk
+
+
+class FMPDataError(RuntimeError):
+    """Raised when Financial Modeling Prep does not return usable records."""
+
+
+_ERROR_KEYS = {"error", "error message", "information", "message", "status", "code"}
+_DATA_KEYS = ("data", "results", "result", "historical", "financials")
+
+
+def response_records(response, endpoint):
+    """Normalize the response shapes returned by old and new FMP endpoints.
+
+    FMP normally returns a list of records, but newer endpoints may wrap records
+    in a ``data``/``results`` object or return a single record.  API errors are
+    dictionaries too; passing one directly to ``DataFrame`` produces Pandas'
+    misleading "all scalar values" exception, so identify those first.
+    """
+    if response is None:
+        raise FMPDataError(f"{endpoint} did not return a response.")
+
+    if isinstance(response, list):
+        records = response
+    elif isinstance(response, dict):
+        lower_keys = {str(key).lower() for key in response}
+        if lower_keys & _ERROR_KEYS and not any(key in response for key in _DATA_KEYS):
+            detail = next(
+                (
+                    response[key]
+                    for key in response
+                    if str(key).lower() in {"error", "error message", "information", "message"}
+                ),
+                "The API rejected the request.",
+            )
+            raise FMPDataError(f"{endpoint}: {detail}")
+
+        wrapped = next((response[key] for key in _DATA_KEYS if key in response), None)
+        if wrapped is not None:
+            records = wrapped if isinstance(wrapped, list) else [wrapped]
+        else:
+            records = [response]
+    else:
+        raise FMPDataError(f"{endpoint} returned an unsupported response type.")
+
+    records = [record for record in records if isinstance(record, dict)]
+    if not records:
+        raise FMPDataError(f"No data was returned by {endpoint}.")
+    return records
+
+
+def response_frame(response, endpoint):
+    """Return a DataFrame from any supported FMP response shape."""
+    return pd.DataFrame.from_records(response_records(response, endpoint))
 
 @st.cache_data
 def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
 
-    bsheet = pd.DataFrame(fmpsdk.balance_sheet_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit))
+    bsheet = response_frame(fmpsdk.balance_sheet_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit), "balance sheet")
 
-    cashflow = pd.DataFrame(fmpsdk.cash_flow_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit))
+    cashflow = response_frame(fmpsdk.cash_flow_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit), "cash flow statement")
 
-    income = pd.DataFrame(fmpsdk.income_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit))
+    income = response_frame(fmpsdk.income_statement(apikey=apikey, symbol=Ticker, period=period, limit=limit), "income statement")
     
-    ratio = pd.DataFrame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit))
+    ratio = response_frame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit), "financial ratios")
 
     # ttm_ratio = pd.DataFrame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker))
 
@@ -47,10 +99,10 @@ def load_data(apikey, Ticker='AAPL', period='quarter', limit=10):
 
 @st.cache_data
 def header_data(apikey, Ticker='AAPL', period='quarter', limit=10):
-    company_profile = pd.DataFrame(fmpsdk.company_profile(apikey=apikey, symbol=Ticker))
+    company_profile = response_frame(fmpsdk.company_profile(apikey=apikey, symbol=Ticker), "company profile")
 
-    ratio = pd.DataFrame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit))
-    ttm_ratio = pd.DataFrame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker))
+    ratio = response_frame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit), "financial ratios")
+    ttm_ratio = response_frame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker), "TTM financial ratios")
 
     df_concat = pd.concat([ ratio, ttm_ratio], axis=1)
     return df_concat, company_profile
