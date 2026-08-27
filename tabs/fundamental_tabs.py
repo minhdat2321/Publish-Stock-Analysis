@@ -1,7 +1,5 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
-import fmpsdk
 from function import fmp_function, plot_chart_function
 from tabs.header_dashboard import header_chart
 from columns_settings import columns_settings
@@ -18,7 +16,17 @@ from data_handling import data_manipulation
 
 def fundamental_chart(  ticker = 'AAPL'):
   # Header
-  df_header, company_dt = fmp_function.header_data(apikey=api_key, Ticker=ticker)
+  ticker = ticker.strip().upper()
+  if not ticker:
+    st.warning("Enter a ticker symbol to load the dashboard.")
+    return
+
+  try:
+    df_header, company_dt = fmp_function.header_data(apikey=api_key, Ticker=ticker)
+  except fmp_function.FMPDataError as error:
+    st.error(f"Unable to load {ticker}: {error}")
+    st.info("Check the ticker and confirm that your FMP API key and subscription include this endpoint.")
+    return
   header_chart(df_header,company_dt=company_dt, tick=ticker)
 
 
@@ -47,7 +55,11 @@ def fundamental_chart(  ticker = 'AAPL'):
 
 
   # Chart data
-  df_final,segment_product, segment_regions  = fmp_function.load_data(apikey=api_key, Ticker=ticker, period=period_option, limit=number_period)
+  try:
+    df_final,segment_product, segment_regions = fmp_function.load_data(apikey=api_key, Ticker=ticker, period=period_option, limit=number_period)
+  except (fmp_function.FMPDataError, KeyError) as error:
+    st.error(f"Unable to load financial statements for {ticker}: {error}")
+    return
 
   df_final = data_manipulation.calc_data(df_final, type_dt=type_dt, roe_type=roe_type, adjust_bs=adjust_bs, period_option=period_option)
 
@@ -143,4 +155,3 @@ def fundamental_chart(  ticker = 'AAPL'):
   pct_change_df = pct_change_df.add_suffix('_pct_change')
   merge_dt = pd.merge(df_final, pct_change_df, how='left', left_index=True, right_index=True)
   st.write(merge_dt)
-

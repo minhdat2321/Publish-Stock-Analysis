@@ -15,6 +15,7 @@ from .settings import (
     BASE_URL_v3,
 )
 from .url_methods import (
+    __return_json_stable,
     __return_json_v3,
     __return_json_v4,
     __validate_industry,
@@ -34,9 +35,9 @@ def company_profile(
     :param symbol: Ticker of Company.
     :return: A list of dictionaries.
     """
-    path = f"profile/{symbol}"
-    query_vars = {"apikey": apikey}
-    return __return_json_v3(path=path, query_vars=query_vars)
+    path = "profile"
+    query_vars = {"apikey": apikey, "symbol": symbol}
+    return __return_json_stable(path=path, query_vars=query_vars)
 
 
 def key_executives(
@@ -151,7 +152,10 @@ def income_statement(
         open(filename, "wb").write(response.content)
         logging.info(f"Saving {symbol} financial statement as {filename}.")
     else:
-        return __return_json_v3(path=path, query_vars=query_vars)
+        return __return_json_stable(
+            path="income-statement",
+            query_vars={**query_vars, "symbol": symbol},
+        )
 
 
 def balance_sheet_statement(
@@ -182,7 +186,10 @@ def balance_sheet_statement(
         open(filename, "wb").write(response.content)
         logging.info(f"Saving {symbol} financial statement as {filename}.")
     else:
-        return __return_json_v3(path=path, query_vars=query_vars)
+        return __return_json_stable(
+            path="balance-sheet-statement",
+            query_vars={**query_vars, "symbol": symbol},
+        )
 
 
 def cash_flow_statement(
@@ -213,7 +220,10 @@ def cash_flow_statement(
         open(filename, "wb").write(response.content)
         logging.info(f"Saving {symbol} financial statement as {filename}.")
     else:
-        return __return_json_v3(path=path, query_vars=query_vars)
+        return __return_json_stable(
+            path="cash-flow-statement",
+            query_vars={**query_vars, "symbol": symbol},
+        )
 
 
 def financial_statement_symbol_lists(
@@ -427,9 +437,9 @@ def financial_ratios_ttm(
     :param symbol: Company ticker
     :return: A list of dictionaries.
     """
-    path = f"ratios-ttm/{symbol}"
-    query_vars = {"apikey": apikey}
-    return __return_json_v3(path=path, query_vars=query_vars)
+    path = "ratios-ttm"
+    query_vars = {"apikey": apikey, "symbol": symbol}
+    return __return_json_stable(path=path, query_vars=query_vars)
 
 
 def financial_ratios(
@@ -447,13 +457,14 @@ def financial_ratios(
     :param limit: Number of rows to return.
     :return: A list of dictionaries.
     """
-    path = f"ratios/{symbol}"
+    path = "ratios"
     query_vars = {
         "apikey": apikey,
         "limit": limit,
         "period": __validate_period(value=period),
+        "symbol": symbol,
     }
-    return __return_json_v3(path=path, query_vars=query_vars)
+    return __return_json_stable(path=path, query_vars=query_vars)
 
 
 def enterprise_values(
@@ -967,7 +978,7 @@ def revenue_product_by_segments(
     :param limit: Number of rows to return.
     :return: A list of dictionaries.
     """
-    path = f"/revenue-product-segmentation?{symbol}"
+    path = "revenue-product-segmentation"
     query_vars = {
         "apikey": apikey,
         "symbol": symbol,
@@ -975,7 +986,7 @@ def revenue_product_by_segments(
         "limit": limit,
         "structure": structure
     }
-    return __return_json_v4(path=path, query_vars=query_vars)
+    return __return_json_stable(path=path, query_vars=query_vars)
 
 def revenue_geographic_segmentation(
     apikey: str, symbol: str, period: str = "annual", limit: int = DEFAULT_LIMIT,
@@ -990,7 +1001,7 @@ def revenue_geographic_segmentation(
     :param limit: Number of rows to return.
     :return: A list of dictionaries.
     """
-    path = f"/revenue-geographic-segmentation?{symbol}"
+    path = "revenue-geographic-segmentation"
     query_vars = {
         "apikey": apikey,
         "symbol": symbol,
@@ -999,7 +1010,7 @@ def revenue_geographic_segmentation(
         "structure": structure
 
     }
-    return __return_json_v4(path=path, query_vars=query_vars)
+    return __return_json_stable(path=path, query_vars=query_vars)
 
 
 def analyst_recommendation(

@@ -13,10 +13,41 @@ from .settings import (
     TIME_DELTA_VALUES,
     BASE_URL_v3,
     BASE_URL_v4,
+    BASE_URL_STABLE,
 )
 
 CONNECT_TIMEOUT = 5
 READ_TIMEOUT = 30
+
+
+def __return_json_stable(
+    path: str, query_vars: typing.Dict
+) -> typing.Optional[typing.List]:
+    """Query a current FMP Stable API endpoint."""
+    return _return_json(url=f"{BASE_URL_STABLE}{path.lstrip('/')}", query_vars=query_vars)
+
+
+def _return_json(url: str, query_vars: typing.Dict):
+    """Make an FMP request while preserving API error payloads for the caller."""
+    return_var = None
+    try:
+        response = requests.get(
+            url, params=query_vars, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
+        )
+        if response.content:
+            return_var = response.json()
+        if not response.content or return_var == {}:
+            logging.warning("Response appears to have no data. Returning empty List.")
+            return_var = []
+    except requests.Timeout:
+        logging.error("Connection to %s timed out.", url)
+    except requests.ConnectionError:
+        logging.error("Connection to %s failed.", url)
+    except requests.TooManyRedirects:
+        logging.error("Request to %s exceeded the redirection limit.", url)
+    except (requests.RequestException, ValueError) as error:
+        logging.error("Request to %s failed: %s", url, error)
+    return return_var
 
 # Disable excessive DEBUG messages.
 logging.getLogger("requests").setLevel(logging.WARNING)
