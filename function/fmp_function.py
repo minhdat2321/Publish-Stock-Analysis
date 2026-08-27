@@ -128,6 +128,9 @@ def header_data(apikey, Ticker='AAPL', period='quarter', limit=10):
     ttm_ratio = response_frame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker), "TTM financial ratios")
     ttm_ratio = _add_legacy_aliases(ttm_ratio, {"peRatioTTM": "priceToEarningsRatioTTM"})
 
+    ratio = response_frame(fmpsdk.financial_ratios(apikey=apikey, symbol=Ticker, period=period, limit=limit), "financial ratios")
+    ttm_ratio = response_frame(fmpsdk.financial_ratios_ttm(apikey=apikey, symbol=Ticker), "TTM financial ratios")
+
     df_concat = pd.concat([ ratio, ttm_ratio], axis=1)
     return df_concat, company_profile
 
